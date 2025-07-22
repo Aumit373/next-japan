@@ -1,0 +1,75 @@
+name: SonarQube Analysis + Quality gate + Build Image + Push Docker Image into DockerHub 
+
+# on:
+#   push:
+#     branches: [main]
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout source code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Tests & Generate Coverage
+        run: |
+          npm install --save-dev jest istanbul
+          npm test -- --coverage --coverageReporters=lcov
+          
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=next-japan
+            -Dsonar.sources=.
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+
+      - name: Quality Gate Check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # Step 2: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Log in to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Step 4: Build and push image
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: aumit373/next-japan:latest
+
+
+
+
+#docker install
+#docker setup and login
+#image pull and make container
+
+#use it for step 3
+            # cd ~/next-japan
+            # # Stop & remove old container
+            # docker stop next-japan || true
+            # docker rm next-japan || true
+            # # Build & run new one
+            # docker build -t next-japan-app .
+            # docker run -d --name next-japan -p 3000:3000 next-japan-app
