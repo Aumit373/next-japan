@@ -2,7 +2,7 @@ name: Connect Deploy + Run Docker Container on EC2
 
 on:
   push:
-     branches: main
+     branches: [main]
 
 
 # on:

@@ -1,11 +1,11 @@
 name: SonarQube Analysis + Quality gate + Build Image + Push Docker Image into DockerHub 
 
-# on:
-#   push:
-#     branches: [main]
-
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+
+# on:
+#   workflow_dispatch:
 
 jobs:
   deploy:
@@ -17,27 +17,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # - name: Run Tests & Generate Coverage
-      #   run: |
-      #     npm install --save-dev jest istanbul
-      #     npm test -- --coverage --coverageReporters=lcov
+      - name: Run Tests & Generate Coverage
+        run: |
+          npm install --save-dev jest istanbul
+          npm test -- --coverage --coverageReporters=lcov
           
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarqube-scan-action@master
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #   with:
-      #     args: >
-      #       -Dsonar.projectKey=next-japan
-      #       -Dsonar.sources=.
-      #       -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=next-japan
+            -Dsonar.sources=.
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
 
-      # - name: Quality Gate Check
-      #   uses: sonarsource/sonarqube-quality-gate-action@master
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Quality Gate Check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
       # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
