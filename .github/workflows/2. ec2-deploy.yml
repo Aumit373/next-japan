@@ -11,7 +11,7 @@ on:
 
 jobs:
   sonar:
-    name: Build, Test & SonarQube
+    name: Conntect to EC2 and Deploy
     runs-on: ubuntu-latest
 
     steps:

@@ -1,9 +1,5 @@
 name: Deploy Monitoring Stack
 
-# on:
-#   push:
-#     branches: main
-
 on:
   workflow_dispatch:
 
@@ -70,7 +66,7 @@ jobs:
               '    restart: unless-stopped' > docker-compose.yml
 
             echo "🚀 Starting Prometheus and Grafana"
-            docker-compose down || true
-            docker-compose up -d
+            sudo docker-compose down || true
+            sudo docker-compose up -d
 
             echo "✅ Monitoring stack deployed successfully"
