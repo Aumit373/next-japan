@@ -8,7 +8,7 @@ RUN npm install
 RUN npm run build
 
 # Stage 2: Run
-FROM node:18-alpine AS runner
+# FROM node:18-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/next.config.js ./
